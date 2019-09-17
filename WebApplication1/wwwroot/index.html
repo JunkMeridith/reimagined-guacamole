@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="_framework/blazor.webassembly.js"></script>
+    <link rel="stylesheet" href="https://atlas.microsoft.com/sdk/javascript/mapcontrol/2/atlas.min.css" type="text/css" />
+    <script src="https://atlas.microsoft.com/sdk/javascript/mapcontrol/2/atlas.min.js"></script>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>WebApplication1</title>
+    <base href="/" />
+    <link href="css/bootstrap/bootstrap.min.css" rel="stylesheet" />
+    <link href="css/site.css" rel="stylesheet" />
+    <script>function GetMap() {
+
+            var map, datasource, popup;
+            // Initialize a map instance.
+            map = new atlas.Map('myMap', {
+                center: [-122.1333, 47.6372],
+                zoom: 16,
+                view: 'Auto',
+                authOptions: {
+                    authType: 'subscriptionKey',
+                    subscriptionKey: 'NvbUjSmc3XXKKFnvPwbYMO4dxnj6LuWmJETU_yS6x5A'
+
+                }
+            });
+
+
+            // Wait until the map resources are ready.
+            map.events.add('ready', function () {
+                // Define an HTML template for a custom popup content laypout.
+                var popupTemplate = '<div class="customInfobox"><div class="name">{name}</div>{description}</div>';
+
+                // Create a data source and add it to the map.
+                datasource = new atlas.source.DataSource();
+                map.sources.add(datasource);
+
+
+                dataSource.add(new atlas.data.Feature(new atlas.data.Point([-122.1333, 47.63]), {
+                    name: 'Microsoft Building 41',
+                    description: '15571 NE 31st St, Redmond, WA 98052'
+                }));
+                // Create a layer to render point data.
+                var symbolLayer = new atlas.layer.SymbolLayer(dataSource);
+
+                // Add the polygon and line the symbol layer to the map.
+                map.layers.add(symbolLayer);
+
+                // Create a popup but leave it closed so we can update it and display it later.
+                popup = new atlas.Popup({
+                    pixelOffset: [0, 0],
+                    closeButton: false
+                });
+
+                // Add a hover event to the symbol layer.
+
+                map.events.add('mouseover', symbolLayer, function (e) {
+                    // Make sure that the point exists.
+                    if (e.shapes && e.shapes.length > 0) {
+                        var content, coordinate;
+                        var properties = e.shapes[0].getProperties();
+                        content = popupTemplate.replace(/{name}/g, properties.name).replace(/{description}/g, properties.description);
+                        coordinate = e.shapes[0].getCoordinates();
+
+                        popup.setOptions({
+                            // Update the content of the popup.
+                            content: content,
+
+                            // Update the popup's position with the symbol's coordinate.
+                            position: coordinate
+
+                        });
+                        //Open the popup.
+                        popup.open(map);
+                    }
+                });
+
+                map.events.add('mouseleave', symbolLayer, function () {
+                    popup.close();
+                });
+
+            });
+        }</script>
+</head>
+<body>
+    <app>Loading...</app>
+    <br>
+    <br>
+</body>
+</html>
